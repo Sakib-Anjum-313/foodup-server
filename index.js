@@ -11,10 +11,10 @@ app.use(express.json());
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
-const uri =
+const MONGODB_URI =
   "mongodb+srv://foodup:NPqRWveqj0FgUsI2@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority";
 
-const client = new MongoClient(uri, {
+const client = new MongoClient(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
@@ -140,22 +140,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-// {
-//           method: "POST",
-//           headers: {
-//             "content-type": "application/json",
-//           },
-//           body: JSON.stringify(data),
-//         }
 
-// app.post("/addNewRestaurant", async (req, res) => {
-//   console.log(req.body);
-//   res.send("get a new res admin");
-// });
-
-// app.get("/addNewRestaurant", async (req, res) => {
-//   res.send("get a new res admin");
-// });
 
 app.get("/", (req, res) => {
   res.send("server is running in vercel");
