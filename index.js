@@ -8,13 +8,12 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 app.use(cors());
 app.use(express.json());
 
-
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
 const uri =
-    "mongodb+srv://foodup:NPqRWveqj0FgUsI2@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority";
-  
+  "mongodb+srv://foodup:NPqRWveqj0FgUsI2@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority";
+
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -23,45 +22,46 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-      await client.connect();
-      console.log("database connected succesfully");
-      const database = client.db("FoodUp");
-      const restaurantCollection = database.collection("RestaurantList");
-      const clientCollection = database.collection("Admin&ResAdminList");
+    await client.connect();
+    console.log("database connected succesfully");
+    const database = client.db("FoodUp");
+    const restaurantCollection = database.collection("RestaurantList");
+    const clientCollection = database.collection("Admin&ResAdminList");
+    const tableInfoCollection = database.collection("TableInfo");
 
-      //adding new restaurant user
-      app.post("/addNewRestaurant", async (req, res) => {
-          console.log(req.body);
-        const newResUser = {
-          OwnerName: req.body.OwnerName,
-          RestaurantName: req.body.RestaurantName,
-          Email: req.body.Email,
-          City: req.body.City,
-          Role:"ResAdmin"
-        };
-        const result = await restaurantCollection.insertOne(newResUser);
-        
-        const newClient = {
-          Name: newResUser.OwnerName,
-          Email: newResUser.Email,
-          Role: "ResAdmin",
-        };
+    //adding new restaurant user
+    app.post("/addNewRestaurant", async (req, res) => {
+      console.log(req.body);
+      const newResUser = {
+        OwnerName: req.body.OwnerName,
+        RestaurantName: req.body.RestaurantName,
+        Email: req.body.Email,
+        City: req.body.City,
+        Role: "ResAdmin",
+      };
+      const result = await restaurantCollection.insertOne(newResUser);
 
-        const insertNewUserToDb = await clientCollection.insertOne(newClient);
-          
-          res.send(result);
-      });
+      const newClient = {
+        Name: newResUser.OwnerName,
+        Email: newResUser.Email,
+        Role: "ResAdmin",
+      };
 
-      //Find All Restaurants
+      const insertNewUserToDb = await clientCollection.insertOne(newClient);
 
-      app.get("/adminPage/allRestaurantList", async(req, res) => {
-        const query = {};
-        
-        const cursor =  restaurantCollection.find(query);
+      res.send(result);
+    });
 
-        const allRestaurantList = await cursor.toArray();
-        res.send(allRestaurantList);
-      });
+    //Find All Restaurants
+
+    app.get("/adminPage/allRestaurantList", async (req, res) => {
+      const query = {};
+
+      const cursor = restaurantCollection.find(query);
+
+      const allRestaurantList = await cursor.toArray();
+      res.send(allRestaurantList);
+    });
 
     //Checking restaurant admin
 
@@ -73,12 +73,10 @@ async function run() {
       console.log(result);
       if (result) {
         res.send(result);
-      }
-      else {
+      } else {
         res.send(false);
       }
     });
-
 
     //checking user Role
 
@@ -88,11 +86,11 @@ async function run() {
       const query = { Email: userEmail };
       const result = await clientCollection.findOne(query);
       console.log(result);
-       if (result) {
-         res.send(result);
-       } else {
-         res.send(false);
-       }
+      if (result) {
+        res.send(result);
+      } else {
+        res.send(false);
+      }
     });
 
     //find my restaurant by email
@@ -105,9 +103,37 @@ async function run() {
       res.send(result);
     });
 
-  
+    // uploading the restaurant table info by res email
 
+    app.put(`/restaurantAdmin/editTableInfo/:email`, async (req, res) => {
+      console.log("resTableList");
+      const resEmail = req.params.email;
+      const resTableList = req.body;
+      // console.log(resTableList);
+      const filter = { ResEmail: resEmail };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          Tables: resTableList,
+        },
+      };
 
+      const result = await tableInfoCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    // get tableinfo by res email
+
+    app.get("/restaurantAdmin/allTableInfo/:email", async (req, res) => {
+      const resEmail = req.params.email;
+      const query = { ResEmail: resEmail };
+      const result = await tableInfoCollection.findOne(query);
+      res.send(result);
+    });
   } finally {
     // await client.close();
   }
@@ -121,7 +147,6 @@ run().catch(console.dir);
 //           },
 //           body: JSON.stringify(data),
 //         }
-
 
 // app.post("/addNewRestaurant", async (req, res) => {
 //   console.log(req.body);
@@ -139,6 +164,6 @@ app.get("/", (req, res) => {
 // running the server
 
 app.listen(port, () => {
-    console.log(`My Server listening at ${port}`);
-    console.log("Server running seccessfully");
-})
+  console.log(`My Server listening at ${port}`);
+  console.log("Server running seccessfully");
+});
