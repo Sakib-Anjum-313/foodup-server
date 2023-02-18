@@ -12,9 +12,9 @@ app.use(express.json());
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
+const MONGODB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
 
-const client = new MongoClient(uri, {
+const client = new MongoClient(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
@@ -134,13 +134,35 @@ async function run() {
       const result = await tableInfoCollection.findOne(query);
       res.send(result);
     });
+
+    //update live table tracking
+    app.put(
+      "/restaurantAdmin/liveTableTracking/updateTable/:email",
+      async (req, res) => {
+        const resEmail = req.params.email;
+        const resTableList = req.body;
+        const filter = { ResEmail: resEmail };
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: {
+            Tables: resTableList,
+          },
+        };
+
+        const result = await tableInfoCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+
+      }
+    );
   } finally {
     // await client.close();
   }
 }
 run().catch(console.dir);
-
-
 
 app.get("/", (req, res) => {
   res.send("server is running in vercel");
