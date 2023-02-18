@@ -12,6 +12,8 @@ app.use(express.json());
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
+
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
