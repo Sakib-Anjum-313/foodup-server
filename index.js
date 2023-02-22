@@ -12,11 +12,9 @@ app.use(express.json());
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
 
-
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
-
-const client = new MongoClient(uri, {
+const client = new MongoClient(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
@@ -30,6 +28,7 @@ async function run() {
     const restaurantCollection = database.collection("RestaurantList");
     const clientCollection = database.collection("Admin&ResAdminList");
     const tableInfoCollection = database.collection("TableInfo");
+    const foodCategoryCollection = database.collection("FoodCategory");
 
     //adding new restaurant user
     app.post("/addNewRestaurant", async (req, res) => {
@@ -157,7 +156,47 @@ async function run() {
           options
         );
         res.send(result);
+      }
+    );
 
+    // adding restaurant food category by email
+
+    app.put(`/restaurantAdmin/menuEdit/:email`, async (req, res) => {
+      const resEmail = req.params.email;
+      const foodCategory = req.body;
+
+      // console.log(resEmail, category);
+      const filter = { ResEmail: resEmail };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          FoodCategories: foodCategory,
+        },
+      };
+
+      const result = await foodCategoryCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    app.get("/restaurantAdmin/menuEdit/category/:email", async (req, res) => {
+      const resEmail = req.params.email;
+
+      const query = { ResEmail: resEmail };
+      const allCategoryList = await foodCategoryCollection.findOne(query);
+      res.send(allCategoryList);
+    });
+
+    // delete a food card
+
+    app.delete(
+      "/restaurantAdmin/menuEdit/category/deleteAFoodCard/:email",
+      async (req, res) => {
+        console.log(req.body);
+        // res.send("data found");
       }
     );
   } finally {
@@ -174,5 +213,5 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => {
   console.log(`My Server listening at ${port}`);
-  console.log("Server running seccessfully");
+  console.log("Server running successfully");
 });
