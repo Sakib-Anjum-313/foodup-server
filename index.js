@@ -32,7 +32,7 @@ async function run() {
 
     //adding new restaurant user
     app.post("/addNewRestaurant", async (req, res) => {
-      console.log(req.body);
+      // console.log(req.body);
       const newResUser = {
         OwnerName: req.body.OwnerName,
         RestaurantName: req.body.RestaurantName,
@@ -68,10 +68,10 @@ async function run() {
 
     app.get("/resAdminCheck/:email", async (req, res) => {
       const userEmail = req.params.email;
-      console.log(userEmail);
+      // console.log(userEmail);
       const query = { Email: userEmail };
       const result = await restaurantCollection.findOne(query);
-      console.log(result);
+      // console.log(result);
       if (result) {
         res.send(result);
       } else {
@@ -83,10 +83,10 @@ async function run() {
 
     app.get("/checkingUserRole/:email", async (req, res) => {
       const userEmail = req.params.email;
-      console.log(userEmail);
+      // console.log(userEmail);
       const query = { Email: userEmail };
       const result = await clientCollection.findOne(query);
-      console.log(result);
+      // console.log(result);
       if (result) {
         res.send(result);
       } else {
@@ -98,7 +98,7 @@ async function run() {
 
     app.get(`/restaurantAdmin/myRestaurant/:email`, async (req, res) => {
       const resEmail = req.params.email;
-      console.log(resEmail);
+      // console.log(resEmail);
       const query = { Email: resEmail };
       const result = await restaurantCollection.findOne(query);
       res.send(result);
@@ -195,7 +195,7 @@ async function run() {
     app.delete(
       "/restaurantAdmin/menuEdit/category/deleteAFoodCard/:email",
       async (req, res) => {
-        console.log(req.body);
+        // console.log(req.body);
         // res.send("data found");
       }
     );
