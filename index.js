@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000; 
+const mongoPort = 27017;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 
@@ -12,9 +13,12 @@ app.use(express.json());
 // db id: foodup
 // pass: NPqRWveqj0FgUsI2
 
+// const uri =
+//   "mongodb+srv://vercel-admin-user:VMNa0tf7Sh7mqrsd@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority";
+
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dmfze9b.mongodb.net/?retryWrites=true&w=majority`;
 
-const client = new MongoClient(process.env.MONGODB_URI, {
+const client = new MongoClient((process.env.MONGODB_URI), {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
